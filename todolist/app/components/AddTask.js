@@ -16,7 +16,8 @@ export const AddTask = ({setLoading}) => {
       setLoading(true);
       await addTodo({
         id: uuidv4(),
-        text: newTaskValue,
+        title: newTaskValue,
+        description: newTaskValue
       });
       setLoading(false);
       setNewTaskValue("");

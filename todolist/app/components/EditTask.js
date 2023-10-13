@@ -16,7 +16,8 @@ export const EditTask = ({todo, setLoading}) => {
       setLoading(true);
       await editTodo({
         id: todo.id,
-        text: newTaskValue,
+        title: newTaskValue,
+        description: newTaskValue,
       });
       setLoading(false);
       setModalOpen(false);

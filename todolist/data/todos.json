@@ -1,16 +1,9 @@
 {
   "tasks": [
     {
-      "id": "682f50e4-c7e2-48e9-a76d-c91467ff1f42",
-      "text": "Télévision"
-    },
-    {
-      "id": "943dcfc0-6373-429a-b2f8-25e9291b40ed",
-      "text": "Manger"
-    },
-    {
-      "id": "d0676abe-7de4-47e1-8d5f-76bb809d22ba",
-      "text": "Dormir"
+      "id": "5dbe4765-6a56-4a77-aa91-a3686695e0d0",
+      "title": "Jouer",
+      "description": "Jouer"
     }
   ]
 }

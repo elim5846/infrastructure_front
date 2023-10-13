@@ -10,7 +10,7 @@ export default function TodoList({data, isLoading, setLoading}) {
         {data.map(todo => {
           return <li key={todo.id} className="p-6 my-8 overflow-hidden bg-white shadow-xl rounded-2xl flex flex-row justify-between">
             <span>
-              {todo.text}
+              {todo.title}
             </span>
             <div>
             <div className='flex flex-row gap-2'>
