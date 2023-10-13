@@ -12,7 +12,7 @@ export default function Home() {
  
   useEffect(() => {
     if (isLoading) {
-        fetch(`${baseUrl}/tasks`, {cache: "no-cache"})
+        fetch(`${baseUrl}`, {cache: "no-cache"})
             .then((res) => res.json())
             .then((data) => {
                 setData(data)
