@@ -211,6 +211,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
 
   provisioner "remote-exec" {
     inline = [
+      "export NODE_BACK_URL=${self.private_ip_address}",
       "git clone https://github.com/elim5846/infrastructure_front.git",
       "cd infrastructure_front",
       "./script_back.sh"
@@ -262,7 +263,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "export NODE_BACK_URL=${azurerm_linux_virtual_machine.my_terraform_back.private_ip_address}:8080",
+      "export NODE_BACK_URL=http://${azurerm_linux_virtual_machine.my_terraform_back.private_ip_address}:8080",
       "echo Hello",
       "echo $NODE_BACK_URL",
       "echo Bye",
