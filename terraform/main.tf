@@ -262,7 +262,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "EXPORT NODE_BACK_URL=${azurerm_linux_virtual_machine.my_terraform_back.public_ip_address}:8080",
+      "export NODE_BACK_URL=${azurerm_linux_virtual_machine.my_terraform_back.private_ip_address}:8080",
       "echo Hello",
       "echo $NODE_BACK_URL",
       "echo Bye",
