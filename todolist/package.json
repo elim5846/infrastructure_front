@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build": "NODE_BACK_URL=$NODE_BACK_URL next build",
+    "start": "NODE_BACK_URL=$NODE_BACK_URL next start",
     "lint": "next lint",
-    "json-server": "json-server --host $NODE_BACK_URL --watch data/todos.json --port 8080"
+    "json-server": "json-server --host $PRIVATE_IP --watch data/todos.json --port 8080"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
