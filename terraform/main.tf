@@ -62,7 +62,7 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
   }
 
   security_rule {
-    name                       = "HTTP BACK"
+    name                       = "HTTP-BACK"
     priority                   = 951
     direction                  = "Inbound"
     access                     = "Allow"
@@ -133,7 +133,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
   size                  = "Standard_DS1_v2"
 
   os_disk {
-    name                 = "myOsDisk"
+    name                 = "myOsDiskBack"
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
@@ -145,7 +145,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
     version   = "latest"
   }
 
-  computer_name  = "hostname"
+  computer_name  = "hostnameBack"
   admin_username = var.username
 
   admin_ssh_key {
