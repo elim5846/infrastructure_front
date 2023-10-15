@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "NODE_BACK_URL=$NODE_BACK_URL next build",
-    "start": "NODE_BACK_URL=$NODE_BACK_URL next start",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint",
     "json-server": "json-server --host $PRIVATE_IP --watch data/todos.json --port 8080"
   },

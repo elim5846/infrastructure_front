@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd todolist
+echo NODE_BACK_URL=$NODE_BACK_URL > .env
 sudo apt-get update && sudo apt-get install -y nodejs
 sudo apt-get update && sudo apt-get install -y npm 
 sudo npm install -g n 
