@@ -2,11 +2,12 @@ var express = require('express');
 var router = express.Router();
 
 const Pool = require('pg').Pool;
+
 const pool = new Pool({
-  user : 'postgres',
-  host: 'localhost',
-  database: 'todo_db',
-  password: 'postgres',
+  user : process.env.POSTGRES_USER || 'docker',
+  host: process.env.POSTGRES_HOST || 'db',
+  database: process.env.POSTGRES_DB || 'todo_db',
+  password: "docker",
   port: 5432,
 });
 

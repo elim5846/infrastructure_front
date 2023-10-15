@@ -1,0 +1,26 @@
+# Utilisez une image Node.js comme image de base
+FROM node:14
+
+# Définissez le répertoire de travail de l'application
+WORKDIR /app
+
+# Copiez le fichier package.json et package-lock.json dans le répertoire de travail
+COPY package*.json ./
+
+# Installez les dépendances de l'application
+RUN npm install
+
+# Copiez le reste des fichiers de l'application dans le répertoire de travail
+COPY . .
+
+# Exposez le port 3000 pour que l'application soit accessible depuis l'extérieur du conteneur
+EXPOSE 3000
+
+# Définissez les variables d'environnement pour la connexion à la base de données PostgreSQL
+ENV POSTGRES_USER docker
+ENV POSTGRES_PASSWORD docker
+ENV POSTGRES_DB todo_db
+ENV POSTGRES_HOST db
+
+# Démarrez l'application en utilisant le script "start" défini dans package.json
+CMD ["npm", "start"]
