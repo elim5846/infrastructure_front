@@ -1,13 +1,13 @@
-const baseUrl = "http://localhost:3001"
+export const baseUrl = process.env.NODE_BACK_URL ? process.env.NODE_BACK_URL : "http://localhost:8080"
 
 export const getAllTodos = async () => {
-    const res = await fetch(`${baseUrl}/tasks`, { cache: "no-store" });
+    const res = await fetch(`${baseUrl}`, { cache: "no-store" });
     const todos = await res.json();
     return todos;
 };
 
 export const editTodo = async (todo) => {
-    const res = await fetch(`${baseUrl}/tasks/${todo.id}`, {
+    const res = await fetch(`${baseUrl}/${todo.id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -19,7 +19,7 @@ export const editTodo = async (todo) => {
 };
 
 export const addTodo = async (todo) => {
-    const res = await fetch(`${baseUrl}/tasks/`, {
+    const res = await fetch(`${baseUrl}/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export const addTodo = async (todo) => {
 };
 
 export const deleteTodo = async (todo) => {
-    const res = await fetch(`${baseUrl}/tasks/${todo.id}`, {
+    const res = await fetch(`${baseUrl}/${todo.id}`, {
         method: "DELETE",
     });
     const deletedTodo = await res.json();

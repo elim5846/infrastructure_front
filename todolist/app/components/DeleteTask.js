@@ -6,16 +6,18 @@ import { useState } from "react";
 import { deleteTodo } from "../api";
 import DeleteModal from "./DeleteModal";
 
-export const DeleteTask = ({todo}) => {
+export const DeleteTask = ({todo, setLoading}) => {
     const router = useRouter();
     const [modalOpen, setModalOpen] = useState(false);
   
     const handleSubmitDeleteTodo = async (e) => {
       e.preventDefault();
+      setLoading(true);
       await deleteTodo({
         id: todo.id,
       });
       setModalOpen(false);
+      setLoading(false);
       router.refresh();
     };
   
