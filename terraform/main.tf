@@ -60,6 +60,18 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+
+  security_rule {
+    name                       = "HTTP BACK"
+    priority                   = 951
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8080"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
 
 # Create network interface
@@ -113,6 +125,53 @@ resource "local_file" "private_file" {
 }
 
 # Create virtual machine
+resource "azurerm_linux_virtual_machine" "my_terraform_back" {
+  name                  = "myVMBack"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
+  size                  = "Standard_DS1_v2"
+
+  os_disk {
+    name                 = "myOsDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  computer_name  = "hostname"
+  admin_username = var.username
+
+  admin_ssh_key {
+    username   = var.username
+    public_key = tls_private_key.tlskey.public_key_openssh
+  }
+
+  connection {
+    host        = self.public_ip_address
+    user        = var.username
+    type        = "ssh"
+    private_key = tls_private_key.tlskey.private_key_pem
+    timeout     = "10m"
+    agent       = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "git clone https://github.com/elim5846/infrastructure_front.git",
+      "cd infrastructure_front",
+      "./script_back.sh"
+    ]
+  }
+}
+
+# Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   name                  = "myVM"
   location              = azurerm_resource_group.rg.location
@@ -156,17 +215,10 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get update && sudo apt-get install -y nodejs",
-      "sudo apt-get update && sudo apt-get install -y npm",
-      "sudo npm install -g n",
-      "sudo npm install -g pm2",
-      "sudo n stable",
-      "hash -r",
+      "EXPORT NODE_BACK_URL=${azurerm_linux_virtual_machine.my_terraform_back.private_ip_address}:8080",
       "git clone https://github.com/elim5846/infrastructure_front.git",
-      "cd infrastructure_front/todolist",
-      "npm install",
-      "npm run build",
-      "pm2 --name HelloWorld start npm -- start"
+      "cd infrastructure_front",
+      "./script_front.sh",
     ]
   }
 }

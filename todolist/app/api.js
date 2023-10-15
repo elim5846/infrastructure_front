@@ -1,4 +1,4 @@
-export const baseUrl = "http://localhost:8080"
+export const baseUrl = process.env.NODE_BACK_URL ? process.env.NODE_BACK_URL : "http://localhost:8080"
 
 export const getAllTodos = async () => {
     const res = await fetch(`${baseUrl}`, { cache: "no-store" });
