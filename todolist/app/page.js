@@ -9,6 +9,9 @@ export default function Home() {
     const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(true)
   const router = useRouter();
+
+  console.log(baseUrl);
+  console.log("ok");
  
   useEffect(() => {
     if (isLoading) {

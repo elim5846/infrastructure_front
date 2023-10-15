@@ -25,8 +25,6 @@ export const AddTask = ({setLoading}) => {
       router.refresh();
     };
 
-    console.log(newTaskValue)
-
     return <div>
       <button className="btn btn-primary w-full" onClick={() => {setModalOpen(true)}}>ADD NEW TASK +</button>
       <Modal isOpen={modalOpen} setIsOpen={setModalOpen} title={"Add new task"} validate={"SUBMIT"} onValidate={handleSubmitNewTodo} inputChange={setNewTaskValue} value={newTaskValue}/>
