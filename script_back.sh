@@ -7,5 +7,6 @@ sudo npm install -g n
 sudo n stable 
 hash -r
 sudo npm install -g pm2
+sudo npm install -g json-server
 npm install
 pm2 --name HelloWorld start npm -- run json-server
