@@ -358,6 +358,10 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
   provisioner "remote-exec" {
     inline = [
       "export PRIVATE_IP=${self.private_ip_address}",
+      "export POSTGRES_USER=docker",
+      "export POSTGRES_PASSWORD=docker",
+      "export POSTGRES_HOST=${azurerm_linux_virtual_machine.my_terraform_db.public_ip_address}",
+      "export POSTGRES_DB=todo_db",
       "git clone https://github.com/elim5846/infrastructure_front.git",
       "cd infrastructure_front",
       "./script_back.sh"
@@ -366,6 +370,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
 }
 
 # Create virtual machine
+/*
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   count                 = 2
   name                  = "myVM-${count.index}"
@@ -417,6 +422,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     ]
   }
 }
+*/
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_db" {
