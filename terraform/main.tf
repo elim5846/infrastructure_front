@@ -73,6 +73,14 @@ resource "azurerm_public_ip" "my_terraform_public_ip_db" {
   allocation_method   = "Dynamic"
 }
 
+# Create public IPs
+resource "azurerm_public_ip" "my_terraform_public_ip_db_rep" {
+  name                = "myPublicIPDbRep"
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
+  allocation_method   = "Dynamic"
+}
+
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "my_terraform_nsg" {
   name                = "myNetworkSecurityGroup"
@@ -166,6 +174,37 @@ resource "azurerm_network_security_group" "my_terraform_nsg_db" {
   }
 }
 
+# Create Network Security Group and rule
+resource "azurerm_network_security_group" "my_terraform_nsg_db_rep" {
+  name                = "myNetworkSecurityGroupDbRep"
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTP-DB"
+    priority                   = 951
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5432"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
 # Create network interface
 resource "azurerm_network_interface" "my_terraform_nic" {
   count               = 2
@@ -209,6 +248,20 @@ resource "azurerm_network_interface" "my_terraform_nic_db" {
   }
 }
 
+# Create network interface
+resource "azurerm_network_interface" "my_terraform_nic_db_rep" {
+  name                = "myNICDbRep"
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
+
+  ip_configuration {
+    name                          = "my_nic_configuration_db_rep"
+    subnet_id                     = azurerm_subnet.my_terraform_subnet_db.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip_db_rep.id
+  }
+}
+
 # Connect the security group to the network interface
 resource "azurerm_network_interface_security_group_association" "example" {
   count                     = 2
@@ -226,6 +279,12 @@ resource "azurerm_network_interface_security_group_association" "exampleBack" {
 resource "azurerm_network_interface_security_group_association" "exampleDb" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic_db.id
   network_security_group_id = azurerm_network_security_group.my_terraform_nsg_db.id
+}
+
+# Connect the security group to the network interface
+resource "azurerm_network_interface_security_group_association" "exampleDbRep" {
+  network_interface_id      = azurerm_network_interface.my_terraform_nic_db_rep.id
+  network_security_group_id = azurerm_network_security_group.my_terraform_nsg_db_rep.id
 }
 
 # Generate random text for a unique storage account name
@@ -407,6 +466,54 @@ resource "azurerm_linux_virtual_machine" "my_terraform_db" {
       "git clone https://github.com/elim5846/infrastructure_front.git",
       "cd infrastructure_front",
       "./script_postgres.sh"
+    ]
+  }
+}
+
+# Create virtual machine
+resource "azurerm_linux_virtual_machine" "my_terraform_db_replicate" {
+  name                  = "myVMDbRep"
+  location              = azurerm_resource_group.rg_db.location
+  resource_group_name   = azurerm_resource_group.rg_db.name
+  network_interface_ids = [azurerm_network_interface.my_terraform_nic_db_rep.id]
+  size                  = "Standard_DS1_v2"
+
+  os_disk {
+    name                 = "myOsDiskDbRep"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  computer_name  = "hostnameDbRep"
+  admin_username = var.username
+
+  admin_ssh_key {
+    username   = var.username
+    public_key = tls_private_key.tlskey.public_key_openssh
+  }
+
+  connection {
+    host        = self.public_ip_address
+    user        = var.username
+    type        = "ssh"
+    private_key = tls_private_key.tlskey.private_key_pem
+    timeout     = "10m"
+    agent       = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "git clone https://github.com/elim5846/infrastructure_front.git",
+      "cd infrastructure_front",
+      "export MAIN_DB_IP=${azurerm_linux_virtual_machine.my_terraform_db.private_ip_address}",
+      "./script_postgres_replicate.sh"
     ]
   }
 }

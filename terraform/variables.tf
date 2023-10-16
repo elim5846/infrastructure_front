@@ -12,7 +12,7 @@ variable "resource_group_name_prefix" {
 
 variable "resource_group_location_db" {
   type        = string
-  default     = "francesouth"
+  default     = "canadaeast"
   description = "Location of the resource group db."
 }
 
