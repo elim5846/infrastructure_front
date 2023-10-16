@@ -370,7 +370,6 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
 }
 
 # Create virtual machine
-/*
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   count                 = 2
   name                  = "myVM-${count.index}"
@@ -422,7 +421,6 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     ]
   }
 }
-*/
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_db" {
