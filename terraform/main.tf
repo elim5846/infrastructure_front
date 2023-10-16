@@ -39,6 +39,14 @@ resource "azurerm_public_ip" "my_terraform_public_ip_back" {
   allocation_method   = "Dynamic"
 }
 
+# Create public IPs
+resource "azurerm_public_ip" "my_terraform_public_ip_db" {
+  name                = "myPublicIPDb"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "my_terraform_nsg" {
   name                = "myNetworkSecurityGroup"
@@ -101,6 +109,37 @@ resource "azurerm_network_security_group" "my_terraform_nsg_back" {
   }
 }
 
+# Create Network Security Group and rule
+resource "azurerm_network_security_group" "my_terraform_nsg_db" {
+  name                = "myNetworkSecurityGroupDb"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTP-DB"
+    priority                   = 951
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5432"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+}
+
 # Create network interface
 resource "azurerm_network_interface" "my_terraform_nic" {
   name                = "myNIC"
@@ -129,6 +168,20 @@ resource "azurerm_network_interface" "my_terraform_nic_back" {
   }
 }
 
+# Create network interface
+resource "azurerm_network_interface" "my_terraform_nic_db" {
+  name                = "myNICDb"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "my_nic_configuration_db"
+    subnet_id                     = azurerm_subnet.my_terraform_subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip_db.id
+  }
+}
+
 # Connect the security group to the network interface
 resource "azurerm_network_interface_security_group_association" "example" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic.id
@@ -139,6 +192,12 @@ resource "azurerm_network_interface_security_group_association" "example" {
 resource "azurerm_network_interface_security_group_association" "exampleBack" {
   network_interface_id      = azurerm_network_interface.my_terraform_nic_back.id
   network_security_group_id = azurerm_network_security_group.my_terraform_nsg_back.id
+}
+
+# Connect the security group to the network interface
+resource "azurerm_network_interface_security_group_association" "exampleDb" {
+  network_interface_id      = azurerm_network_interface.my_terraform_nic_db.id
+  network_security_group_id = azurerm_network_security_group.my_terraform_nsg_db.id
 }
 
 # Generate random text for a unique storage account name
@@ -267,6 +326,51 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
       "git clone https://github.com/elim5846/infrastructure_front.git",
       "cd infrastructure_front",
       "./script_front.sh",
+    ]
+  }
+}
+
+# Create virtual machine
+resource "azurerm_linux_virtual_machine" "my_terraform_db" {
+  name                  = "myVMDb"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.my_terraform_nic_db.id]
+  size                  = "Standard_DS1_v2"
+
+  os_disk {
+    name                 = "myOsDiskDb"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  computer_name  = "hostnameDb"
+  admin_username = var.username
+
+  admin_ssh_key {
+    username   = var.username
+    public_key = tls_private_key.tlskey.public_key_openssh
+  }
+
+  connection {
+    host        = self.public_ip_address
+    user        = var.username
+    type        = "ssh"
+    private_key = tls_private_key.tlskey.private_key_pem
+    timeout     = "10m"
+    agent       = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      ""
     ]
   }
 }
