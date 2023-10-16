@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd todolist
-echo NEXT_PUBLIC_NODE_BACK_URL=$NEXT_PUBLIC_NODE_BACK_URL > .env
+echo NEXT_PUBLIC_NODE_BACK_URL=$NEXT_PUBLIC_NODE_BACK_URL >> .env
 sudo apt-get update && sudo apt-get install -y nodejs
 sudo apt-get update && sudo apt-get install -y npm 
 sudo npm install -g n 
