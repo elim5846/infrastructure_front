@@ -30,10 +30,10 @@ export default function Home() {
         <AddTask setLoading={setLoading}/>
       </div>
       <div className='w-full bg-slate-300 flex flex-row justify-between p-3 rounded-md'>
-        <span className='font-bold'>
+        <span className='font-bold text-black'>
           TASK
         </span>
-        <span className='font-bold'>
+        <span className='font-bold text-black'>
           ACTIONS
         </span>
       </div>

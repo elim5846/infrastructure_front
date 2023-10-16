@@ -9,7 +9,7 @@ export default function TodoList({data, isLoading, setLoading}) {
       <ul className="w-full">
         {data.map(todo => {
           return <li key={todo.id} className="p-6 my-8 overflow-hidden bg-white shadow-xl rounded-2xl flex flex-row justify-between">
-            <span>
+            <span className='text-black'>
               {todo.title}
             </span>
             <div>
