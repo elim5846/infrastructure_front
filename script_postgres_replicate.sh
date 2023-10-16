@@ -2,8 +2,7 @@
 
 sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-sudo apt-get update 
-sudo apt-get install -y postgresql postgresql-contrib
+sudo apt-get update && sudo apt-get install -y postgresql
 sudo systemctl stop postgresql
 sudo chmod 777 /etc/postgresql/16/main/postgresql.conf 
 sudo echo -e "\nhot_standby = on\n" >> /etc/postgresql/16/main/postgresql.conf 
