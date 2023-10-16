@@ -298,7 +298,6 @@ resource "random_id" "random_id" {
 }
 
 # Create storage account for boot diagnostics
-/*
 resource "azurerm_storage_account" "my_storage_account" {
   name                     = "diag${random_id.random_id.hex}"
   location                 = azurerm_resource_group.rg.location
@@ -306,7 +305,6 @@ resource "azurerm_storage_account" "my_storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
-*/
 
 resource "tls_private_key" "tlskey" {
   algorithm = "RSA"
@@ -320,7 +318,6 @@ resource "local_file" "private_file" {
 }
 
 # Create virtual machine
-/*
 resource "azurerm_linux_virtual_machine" "my_terraform_back" {
   name                  = "myVMBack"
   location              = azurerm_resource_group.rg.location
@@ -367,10 +364,8 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
     ]
   }
 }
-*/
 
 # Create virtual machine
-/*
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   count                 = 2
   name                  = "myVM-${count.index}"
@@ -421,7 +416,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
       "./script_front.sh",
     ]
   }
-} */
+}
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_db" {
@@ -510,9 +505,9 @@ resource "azurerm_linux_virtual_machine" "my_terraform_db_replicate" {
 
   provisioner "remote-exec" {
     inline = [
+      "export MAIN_DB_IP=${azurerm_linux_virtual_machine.my_terraform_db.private_ip_address}",
       "git clone https://github.com/elim5846/infrastructure_front.git",
       "cd infrastructure_front",
-      "export MAIN_DB_IP=${azurerm_linux_virtual_machine.my_terraform_db.private_ip_address}",
       "./script_postgres_replicate.sh"
     ]
   }
