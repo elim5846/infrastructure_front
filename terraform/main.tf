@@ -211,6 +211,7 @@ resource "random_id" "random_id" {
 }
 
 # Create storage account for boot diagnostics
+/*
 resource "azurerm_storage_account" "my_storage_account" {
   name                     = "diag${random_id.random_id.hex}"
   location                 = azurerm_resource_group.rg.location
@@ -218,6 +219,7 @@ resource "azurerm_storage_account" "my_storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
+*/
 
 resource "tls_private_key" "tlskey" {
   algorithm = "RSA"
@@ -231,6 +233,7 @@ resource "local_file" "private_file" {
 }
 
 # Create virtual machine
+/*
 resource "azurerm_linux_virtual_machine" "my_terraform_back" {
   name                  = "myVMBack"
   location              = azurerm_resource_group.rg.location
@@ -277,8 +280,10 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
     ]
   }
 }
+*/
 
 # Create virtual machine
+/*
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   name                  = "myVM"
   location              = azurerm_resource_group.rg.location
@@ -328,7 +333,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
       "./script_front.sh",
     ]
   }
-}
+} */
 
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_db" {
@@ -370,7 +375,9 @@ resource "azurerm_linux_virtual_machine" "my_terraform_db" {
 
   provisioner "remote-exec" {
     inline = [
-      ""
+      "git clone https://github.com/elim5846/infrastructure_front.git",
+      "cd infrastructure_front",
+      "./script_postgres.sh"
     ]
   }
 }
