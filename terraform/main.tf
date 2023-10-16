@@ -137,7 +137,7 @@ resource "azurerm_network_security_group" "my_terraform_nsg_back" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "8080"
+    destination_port_range     = "3000"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -415,7 +415,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
 
   provisioner "remote-exec" {
     inline = [
-      "export NEXT_PUBLIC_NODE_BACK_URL=http://${azurerm_linux_virtual_machine.my_terraform_back.public_ip_address}:8080",
+      "export NEXT_PUBLIC_NODE_BACK_URL=http://${azurerm_linux_virtual_machine.my_terraform_back.public_ip_address}:3000/todo",
       "git clone https://github.com/elim5846/infrastructure_front.git",
       "cd infrastructure_front",
       "./script_front.sh",
