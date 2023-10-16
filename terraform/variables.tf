@@ -10,6 +10,18 @@ variable "resource_group_name_prefix" {
   description = "Prefix of the resource group name that's combined with a random ID so name is unique in your Azure subscription."
 }
 
+variable "resource_group_location_db" {
+  type        = string
+  default     = "francesouth"
+  description = "Location of the resource group db."
+}
+
+variable "resource_group_name_prefix_db" {
+  type        = string
+  default     = "rg_db"
+  description = "Prefix of the resource group db name that's combined with a random ID so name is unique in your Azure subscription."
+}
+
 variable "username" {
   type        = string
   description = "The username for the local account that will be created on the new VM."

@@ -2,9 +2,18 @@ resource "random_pet" "rg_name" {
   prefix = var.resource_group_name_prefix
 }
 
+resource "random_pet" "rg_name_db" {
+  prefix = var.resource_group_name_prefix_db
+}
+
 resource "azurerm_resource_group" "rg" {
   location = var.resource_group_location
   name     = random_pet.rg_name.id
+}
+
+resource "azurerm_resource_group" "rg-db" {
+  location = var.resource_group_location_db
+  name     = random_pet.rg_name_db.id
 }
 
 # Create virtual network
@@ -20,6 +29,22 @@ resource "azurerm_subnet" "my_terraform_subnet" {
   name                 = "mySubnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.my_terraform_network.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Create virtual network
+resource "azurerm_virtual_network" "my_terraform_network_db" {
+  name                = "myVnetDb"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
+}
+
+# Create subnet
+resource "azurerm_subnet" "my_terraform_subnet_db" {
+  name                 = "mySubnetDb"
+  resource_group_name  = azurerm_resource_group.rg_db.name
+  virtual_network_name = azurerm_virtual_network.my_terraform_network_db.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
@@ -43,8 +68,8 @@ resource "azurerm_public_ip" "my_terraform_public_ip_back" {
 # Create public IPs
 resource "azurerm_public_ip" "my_terraform_public_ip_db" {
   name                = "myPublicIPDb"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
   allocation_method   = "Dynamic"
 }
 
@@ -113,8 +138,8 @@ resource "azurerm_network_security_group" "my_terraform_nsg_back" {
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "my_terraform_nsg_db" {
   name                = "myNetworkSecurityGroupDb"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
 
   security_rule {
     name                       = "SSH"
@@ -173,12 +198,12 @@ resource "azurerm_network_interface" "my_terraform_nic_back" {
 # Create network interface
 resource "azurerm_network_interface" "my_terraform_nic_db" {
   name                = "myNICDb"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg_db.location
+  resource_group_name = azurerm_resource_group.rg_db.name
 
   ip_configuration {
     name                          = "my_nic_configuration_db"
-    subnet_id                     = azurerm_subnet.my_terraform_subnet.id
+    subnet_id                     = azurerm_subnet.my_terraform_subnet_db.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.my_terraform_public_ip_db.id
   }
@@ -342,8 +367,8 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
 # Create virtual machine
 resource "azurerm_linux_virtual_machine" "my_terraform_db" {
   name                  = "myVMDb"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
+  location              = azurerm_resource_group.rg_db.location
+  resource_group_name   = azurerm_resource_group.rg_db.name
   network_interface_ids = [azurerm_network_interface.my_terraform_nic_db.id]
   size                  = "Standard_DS1_v2"
 
