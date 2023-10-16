@@ -11,7 +11,7 @@ resource "azurerm_resource_group" "rg" {
   name     = random_pet.rg_name.id
 }
 
-resource "azurerm_resource_group" "rg-db" {
+resource "azurerm_resource_group" "rg_db" {
   location = var.resource_group_location_db
   name     = random_pet.rg_name_db.id
 }
