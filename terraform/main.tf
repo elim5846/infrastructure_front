@@ -351,7 +351,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_back" {
     user        = var.username
     type        = "ssh"
     private_key = tls_private_key.tlskey.private_key_pem
-    timeout     = "10m"
+    timeout     = "30m"
     agent       = false
   }
 
@@ -404,7 +404,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     user        = var.username
     type        = "ssh"
     private_key = tls_private_key.tlskey.private_key_pem
-    timeout     = "10m"
+    timeout     = "30m"
     agent       = false
   }
 
@@ -452,7 +452,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_db" {
     user        = var.username
     type        = "ssh"
     private_key = tls_private_key.tlskey.private_key_pem
-    timeout     = "10m"
+    timeout     = "30m"
     agent       = false
   }
 
@@ -499,7 +499,7 @@ resource "azurerm_linux_virtual_machine" "my_terraform_db_replicate" {
     user        = var.username
     type        = "ssh"
     private_key = tls_private_key.tlskey.private_key_pem
-    timeout     = "10m"
+    timeout     = "30m"
     agent       = false
   }
 
