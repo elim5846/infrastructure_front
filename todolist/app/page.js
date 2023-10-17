@@ -6,10 +6,10 @@ import { baseUrl } from './api';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-    const [data, setData] = useState(null)
+  const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(true)
   const router = useRouter();
- 
+
   useEffect(() => {
     if (isLoading) {
         fetch(`${baseUrl}`, {cache: "no-cache"})

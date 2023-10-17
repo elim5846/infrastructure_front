@@ -50,11 +50,11 @@ const createTodo = (request, response) => {
 
 const updateTodo = (request, response) => {
   const id = parseInt(request.params.id);
-  const { name, description } = request.body;
+  const { title, description } = request.body;
 
   pool.query(
     'UPDATE todo SET title = $1, description = $2 WHERE id = $3',
-    [name, email, id],
+    [title, description, id],
     (error, results) => {
       if (error) {
         throw error;

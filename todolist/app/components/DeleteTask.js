@@ -12,12 +12,11 @@ export const DeleteTask = ({todo, setLoading}) => {
   
     const handleSubmitDeleteTodo = async (e) => {
       e.preventDefault();
-      setLoading(true);
       await deleteTodo({
         id: todo.id,
       });
+      setLoading(true);
       setModalOpen(false);
-      setLoading(false);
       router.refresh();
     };
   

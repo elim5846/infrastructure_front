@@ -1,7 +1,7 @@
 export const baseUrl = process.env.NEXT_PUBLIC_NODE_BACK_URL ? process.env.NEXT_PUBLIC_NODE_BACK_URL : "http://localhost:3000/todo"
 
 export const getAllTodos = async () => {
-    const res = await fetch(`${baseUrl}`, { cache: "no-store" });
+    const res = await fetch(`${baseUrl}`);
     const todos = await res.json();
     return todos;
 };
@@ -14,8 +14,7 @@ export const editTodo = async (todo) => {
         },
         body: JSON.stringify(todo),
     });
-    const updatedTodo = await res.json();
-    return updatedTodo;
+    return res;
 };
 
 export const addTodo = async (todo) => {
@@ -26,14 +25,12 @@ export const addTodo = async (todo) => {
         },
         body: JSON.stringify(todo),
     });
-    const addedTodo = await res.json();
-    return addedTodo;
+    return res;
 };
 
 export const deleteTodo = async (todo) => {
     const res = await fetch(`${baseUrl}/${todo.id}`, {
         method: "DELETE",
     });
-    const deletedTodo = await res.json();
-    return deletedTodo;
+    return res;
 };

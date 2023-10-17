@@ -13,13 +13,12 @@ export const AddTask = ({setLoading}) => {
   
     const handleSubmitNewTodo = async (e) => {
       e.preventDefault();
-      setLoading(true);
       await addTodo({
         id: uuidv4(),
         title: newTaskValue,
         description: newTaskValue
       });
-      setLoading(false);
+      setLoading(true);
       setNewTaskValue("");
       setModalOpen(false);
       router.refresh();
