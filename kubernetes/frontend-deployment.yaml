@@ -18,3 +18,6 @@ spec:
         image: arkhann/epita2024_infra_front:latest
         ports:
         - containerPort: 3000
+        env:
+        - name: NEXT_PUBLIC_NODE_BACK_URL
+          value: "backend-service"
