@@ -3,11 +3,11 @@ output "resource_group_name" {
 }
 
 output "public_ip_address_front" {
-  value = [for vm in azurerm_linux_virtual_machine.my_terraform_vm : vm.public_ip_address]
+  value = azurerm_public_ip.my_terraform_public_ip_front.ip_address
 }
 
 output "public_ip_address_back" {
-  value = azurerm_linux_virtual_machine.my_terraform_back.public_ip_address
+  value = azurerm_public_ip.my_terraform_public_ip_back.ip_address
 }
 
 output "public_ip_address_db" {
