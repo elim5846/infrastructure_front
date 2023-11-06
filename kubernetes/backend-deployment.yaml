@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: backend
-        image: NOM_CONTENEUR_BACK:latest
+        image: arkhann/epita2024_infra_back:latest
         ports:
         - containerPort: 3000
