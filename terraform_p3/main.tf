@@ -38,17 +38,124 @@ resource "azurerm_kubernetes_cluster" "aks" {
     }
 }
 
-resource "kubernetes_namespace" "frontend" {
+resource "kubernetes_namespace" "application" {
     metadata {
-        name = "frontend"
+        name = "application"
     }
 }
 
-resource "kubernetes_namespace" "backend" {
-    metadata {
-        name = "backend"
+
+
+# resource "azurerm_postgresql_server" "postgres_server" {
+#     name                = "todo-db"
+#     location            = azurerm_resource_group.aks.location
+#     resource_group_name = azurerm_resource_group.aks.name
+
+#     administrator_login          = "MyUnknownLogin"
+#     administrator_login_password = "P@ssw0rdC0mpl3x"
+
+#     sku_name   = "GP_Gen5_4"
+#     version    = "11"
+#     storage_mb = 640000
+
+#     backup_retention_days        = 7
+#     geo_redundant_backup_enabled = true
+#     auto_grow_enabled            = true
+
+#     public_network_access_enabled    = false
+#     ssl_enforcement_enabled          = true
+#     ssl_minimal_tls_version_enforced = "TLS1_2"
+# }
+
+# resource "azurerm_postgresql_database" "postgres_database" {
+#     name                = "todo-db"
+#     resource_group_name = azurerm_resource_group.aks.name
+#     server_name         = azurerm_postgresql_server.postgres_server.name
+#     charset             = "UTF8"
+#     collation           = "English_United States.1252"
+#   }
+
+
+
+
+
+resource "kubernetes_manifest" "postgres-service" {
+  manifest = {
+    "apiVersion" = "v1"
+    "kind" = "Service"
+    "metadata" = {
+      "name" = "postgres-service"
+      "namespace" = "application"
     }
+    "spec" = {
+      "ports" = [
+        {
+          "port" = 5432
+          "protocol" = "TCP"
+          "targetPort" = 5432
+        },
+      ]
+      "selector" = {
+        "app" = "postgres"
+      }
+      "type" = "ClusterIP"
+    }
+  }
 }
+
+
+
+resource "kubernetes_manifest" "postgres-deployment" {
+  manifest = {
+    "apiVersion" = "apps/v1"
+    "kind" = "Deployment"
+    "metadata" = {
+      "name" = "postgres-deployment"
+      "namespace" = "application"
+    }
+    "spec" = {
+      "replicas" = 1
+      "selector" = {
+        "matchLabels" = {
+          "app" = "postgres"
+        }
+      }
+      "template" = {
+        "metadata" = {
+          "labels" = {
+            "app" = "postgres"
+          }
+        }
+        "spec" = {
+          "containers" = [
+            {
+              "image" = "arkhann/epita2024_infra_postgre:latest"
+              "name" = "postgres"
+              "imagePullPolicy" = "IfNotPresent"
+              "ports" = [
+                {
+                  "containerPort" = 5432
+                },
+              ]
+            },
+          ]
+          "volumes" = [
+            {
+              "name" = "postgredb"
+              "persistentVolumeClaim" = {
+                "claimName" = "postgres-pv-claim"
+              }
+            },
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+
+
 
 
 resource "kubernetes_manifest" "backend-service" {
@@ -57,18 +164,18 @@ resource "kubernetes_manifest" "backend-service" {
     "kind" = "Service"
     "metadata" = {
       "name" = "backend-service"
-      "namespace" = "backend"
+      "namespace" = "application"
     }
     "spec" = {
       "ports" = [
         {
           "port" = 3000
           "protocol" = "TCP"
-          "targetPort" = 3001
+          "targetPort" = 3000
         },
       ]
       "selector" = {
-        "app" = "frontend"
+        "app" = "backend"
       }
       "type" = "ClusterIP"
     }
@@ -84,7 +191,7 @@ resource "kubernetes_manifest" "backend-deployment" {
     "kind" = "Deployment"
     "metadata" = {
       "name" = "backend-deployment"
-      "namespace" = "backend"
+      "namespace" = "application"
     }
     "spec" = {
       "replicas" = 3
@@ -102,6 +209,12 @@ resource "kubernetes_manifest" "backend-deployment" {
         "spec" = {
           "containers" = [
             {
+              "env" = [
+                {
+                  "name" = "POSTGRES_HOST"
+                  "value" = "postgres-service"
+                }
+              ]
               "image" = "arkhann/epita2024_infra_back:latest"
               "name" = "backend"
               "ports" = [
@@ -118,14 +231,13 @@ resource "kubernetes_manifest" "backend-deployment" {
 }
 
 
-
 resource "kubernetes_manifest" "frontend-service" {
   manifest = {
     "apiVersion" = "v1"
     "kind" = "Service"
     "metadata" = {
       "name" = "frontend-service"
-      "namespace" = "frontend"
+      "namespace" = "application"
     }
     "spec" = {
       "ports" = [
@@ -149,7 +261,7 @@ resource "kubernetes_manifest" "frontend-deployment" {
     "kind" = "Deployment"
     "metadata" = {
       "name" = "frontend-deployment"
-      "namespace" = "frontend"
+      "namespace" = "application"
     }
     "spec" = {
       "replicas" = 3
@@ -170,7 +282,7 @@ resource "kubernetes_manifest" "frontend-deployment" {
               "env" = [
                 {
                   "name" = "NEXT_PUBLIC_NODE_BACK_URL"
-                  "value" = "backend-service"
+                  "value" = "http://backend-service:3000"
                 },
               ]
               "image" = "arkhann/epita2024_infra_front:latest"
