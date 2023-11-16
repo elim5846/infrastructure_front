@@ -18,9 +18,7 @@ var pool = new Pool({
 const getTodo = (request, response) => {
   console.log("ok")
   pool.query('SELECT * FROM todo ORDER BY id ASC', (error, results) => {
-    console.log(error)
     if (error) {
-      console.log(pool.options)
       if (pool.options.host == process.env.POSTGRES_HOST) {
         pool = new Pool({
           user : process.env.POSTGRES_USER || 'docker',
@@ -30,7 +28,6 @@ const getTodo = (request, response) => {
           port: 5432,
         });
       }
-      console.log(error)
       return error;
     }
     response.status(200).json(results.rows);
@@ -42,7 +39,6 @@ const getTodoById = (request, response) => {
 
   pool.query('SELECT * FROM todo WHERE id = $1', [id], (error, results) => {
     if (error) {
-      console.log(pool.options)
       if (pool.options.host == process.env.POSTGRES_HOST) {
         pool = new Pool({
           user : process.env.POSTGRES_USER || 'docker',
@@ -52,7 +48,6 @@ const getTodoById = (request, response) => {
           port: 5432,
         });
       }
-      console.log(error)
       return error;
     }
     response.status(200).json(results.rows);
@@ -67,7 +62,6 @@ const createTodo = (request, response) => {
     [title, description],
     (error, results) => {
       if (error) {
-        console.log(pool.options)
         if (pool.options.host == process.env.POSTGRES_HOST) {
           pool = new Pool({
             user : process.env.POSTGRES_USER || 'docker',
@@ -77,7 +71,6 @@ const createTodo = (request, response) => {
             port: 5432,
           });
         }
-        console.log(error)
         return error;
       }
       response.status(201).send(`Todo added with ID: ${results.rows[0].id}`);
@@ -94,7 +87,6 @@ const updateTodo = (request, response) => {
     [title, description, id],
     (error, results) => {
       if (error) {
-        console.log(pool.options)
         if (pool.options.host == process.env.POSTGRES_HOST) {
           pool = new Pool({
             user : process.env.POSTGRES_USER || 'docker',
@@ -104,7 +96,6 @@ const updateTodo = (request, response) => {
             port: 5432,
           });
         }
-        console.log(error)
         return error;
       }
       response.status(200).send(`Todo modified with ID: ${id}`);
@@ -117,7 +108,6 @@ const deleteTodo = (request, response) => {
 
   pool.query('DELETE FROM todo WHERE id = $1', [id], (error, results) => {
     if (error) {
-      console.log(pool.options)
       if (pool.options.host == process.env.POSTGRES_HOST) {
         pool = new Pool({
           user : process.env.POSTGRES_USER || 'docker',
@@ -127,7 +117,6 @@ const deleteTodo = (request, response) => {
           port: 5432,
         });
       }
-      console.log(error)
       return error;
     }
     response.status(200).send(`Todo deleted with ID: ${id}`);
