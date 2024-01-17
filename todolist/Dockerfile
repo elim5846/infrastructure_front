@@ -9,9 +9,12 @@ COPY . .
 COPY --from=dependencies /my-project/node_modules ./node_modules
 RUN npm run build
 
+
+
 FROM node:lts as runner
 WORKDIR /my-project
 ENV NODE_ENV production
+ENV NEXT_PUBLIC_NODE_BACK_URL http://backend-service:3000
 # If you are using a custom next.config.js file, uncomment this line.
 COPY --from=builder /my-project/next.config.js ./
 COPY --from=builder /my-project/public ./public

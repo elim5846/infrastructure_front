@@ -46,6 +46,45 @@ resource "kubernetes_namespace" "application" {
 
 
 
+
+
+resource "azurerm_postgresql_server" "postgres-database" {
+  name                = "postgresqldatabasep3"
+  resource_group_name = azurerm_resource_group.aks.name
+  location            = azurerm_resource_group.aks.location
+  sku_name            = "B_Gen5_1"
+
+  administrator_login          = "docker"
+  administrator_login_password = "@DMIN000"
+
+  ssl_enforcement_enabled       = true
+  public_network_access_enabled = true
+
+  version = "11"
+}
+
+resource "azurerm_postgresql_database" "public_database" {
+  name                = "todo_db"
+  resource_group_name = azurerm_resource_group.aks.name
+  server_name         = azurerm_postgresql_server.postgres-database.name
+  charset             = "UTF8"
+  collation           = "fr-FR"
+}
+
+
+resource "null_resource" "psql_command" {
+  depends_on = [azurerm_postgresql_database.public_database]
+
+  provisioner "local-exec" {
+    command = "PGPASSWORD=@DMIN000 psql -h postgresqldatabasep3.postgres.database.azure.com -U docker@postgresqldatabasep3 -d todo_db -f ../backend/init.sql"
+  }
+}
+
+
+
+
+
+
 resource "kubernetes_manifest" "backend-service" {
   manifest = {
     "apiVersion" = "v1"
@@ -100,7 +139,23 @@ resource "kubernetes_manifest" "backend-deployment" {
               "env" = [
                 {
                   "name" = "POSTGRES_HOST"
-                  "value" = "postgres-service"
+                  "value" = "postgresqldatabasep3.postgres.database.azure.com"
+                },
+                {
+                  "name" = "POSTGRES_PORT"
+                  "value" = 5432
+                },
+                {
+                  "name" = "POSTGRES_DB"
+                  "value" = "todo_db"
+                },
+                {
+                  "name" = "POSTGRES_USER"
+                  "value" = "docker@postgresqldatabasep3"
+                },
+                {
+                  "name" = "POSTGRES_PASSWORD"
+                  "value" = "@DMIN000"
                 }
               ]
               "image" = "arkhann/epita2024_infra_back:latest"
@@ -188,24 +243,3 @@ resource "kubernetes_manifest" "frontend-deployment" {
   }
 }
 
-resource "azurerm_postgresql_server" "postgres-database" {
-  name                = "postgresqldatabasep3"
-  resource_group_name = azurerm_resource_group.aks.name
-  location            = azurerm_resource_group.aks.location
-  sku_name            = "B_Gen5_1"
-
-  administrator_login          = "docker"
-  administrator_login_password = "@DMIN000"
-
-  ssl_enforcement_enabled = true
-
-  version = "11"
-}
-
-resource "azurerm_postgresql_database" "public_database" {
-  name                = "public"
-  resource_group_name = azurerm_resource_group.aks.name
-  server_name         = azurerm_postgresql_server.postgres-database.name
-  charset             = "UTF8"
-  collation           = "fr-FR"
-}

@@ -8,8 +8,8 @@ var pool = new Pool({
   user : process.env.POSTGRES_USER || 'docker',
   host: process.env.POSTGRES_HOST || 'db',
   database: process.env.POSTGRES_DB || 'todo_db',
-  password: "docker",
-  port: 5432,
+  password: process.env.POSTGRES_PASSWORD || "docker",
+  port: process.env.POSTGRES_PORT || 5432,
   connectionTimeoutMillis : 5000,
   idleTimeoutMillis : 30000
 });

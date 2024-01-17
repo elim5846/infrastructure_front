@@ -17,10 +17,11 @@ COPY . .
 EXPOSE 3000
 
 # Définissez les variables d'environnement pour la connexion à la base de données PostgreSQL
-ENV POSTGRES_USER docker
-ENV POSTGRES_PASSWORD docker
+ENV POSTGRES_USER docker@postgresqldatabasep3
+ENV POSTGRES_HOST postgresqldatabasep3.postgres.database.azure.com
+ENV POSTGRES_PASSWORD @DMIN000
 ENV POSTGRES_DB todo_db
-ENV POSTGRES_HOST db
+ENV POSTGRES_PORT 5432
 
 # Démarrez l'application en utilisant le script "start" défini dans package.json
 CMD ["npm", "start"]
